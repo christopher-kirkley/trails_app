@@ -20,7 +20,7 @@ function sendHttpRequest(method, url, data) {
 };
 
 function getJSON() {
-	sendHttpRequest('GET', 'http://127.0.0.1:5000/api/get_trails').then(responseData => {
+	sendHttpRequest('GET', 'http://127.0.0.1:5000/api/trail').then(responseData => {
 		const data = responseData;
 
 		data.forEach((trail) => addTrailToList(trail)); 

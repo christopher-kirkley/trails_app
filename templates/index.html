@@ -7,18 +7,41 @@
   <div class="container mt-4">
 	<h1>go outside ffs</h1>
 	<hr>
+	<p>Add a trail</p>
+	<form>
+	  <div class="form-group">
+		<label for="trail-name">Trail Name</label>
+		<input type="text" class="form-control" id="name">
+	  </div>
+	  <div class="form-group">
+		<label for="distance">Distance</label>
+		<input type="text" class="form-control" id="distance">
+	  </div>
+	  <div class="form-group">
+		<label for="neighborhood">Neighborhood</label>
+		<input type="text" class="form-control" id="neighborhood">
+	  </div>
+	  <div class="form-group">
+		<label for="status">Status</label>
+		<input type="text" class="form-control" id="trail-status">
+	  </div>
+	  <input type="submit" value="Add" class="btn btn-primary" id="add">
+	</form>
+	<hr>
 	<table class="table">
 	  <thead>
 		<th>Trail</th>
 		<th>Distance</th>
 		<th>Neighborhood</th>
 		<th>Status</th>
+		<th></th>
 	  </thead>
 	  <tbody id="trails-table">
 	  </tbody>
+	</table>
   </div>
 </body>
 <script type="text/javascript"
-        src="{{ url_for('static', filename='main.js') }}"></script>
+		src="{{ url_for('static', filename='main.js') }}"></script>
 </html>
 

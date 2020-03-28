@@ -56,5 +56,12 @@ def get_trails():
     result = trails_schema.dump(all_trails)
     return jsonify(result) 
 
+
+@app.route('/api/trail/<id>', methods=['DELETE']) # route is the endpoint
+def delete_trail(id):
+    Trail.query.filter(Trail.id == id).delete()
+    db.session.commit()
+    return jsonify({'result': True})
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -22,7 +22,6 @@ function sendHttpRequest(method, url, data) {
 function getJSON() {
 	sendHttpRequest('GET', 'http://127.0.0.1:5000/api/trail').then(responseData => {
 		const data = responseData;
-
 		data.forEach((trail) => addTrailToList(trail)); 
 		});
 };
@@ -37,7 +36,7 @@ function sendJSON() {
 				'distance': 3,
 				'status': false,
 				}
-	console.log(json);
+	addTrailToList(json);
 	sendHttpRequest('POST', 'http://127.0.0.1:5000/api/trail', json);
 };
 
@@ -49,11 +48,16 @@ function deleteTrail(trail_id) {
 
 };
 
+function updateTrail(trail_id) {
+	sendHttpRequest('PATCH', `http://127.0.0.1:5000/api/trail/${trail_id}`).then(responseData => {
+		});
+
+};
 
 
 function addTrailToList(trail) {
 	const list = document.querySelector('#trails-table');
-	
+
 	const row = document.createElement('tr');
 
 	row.innerHTML = `
@@ -65,22 +69,32 @@ function addTrailToList(trail) {
 	`;
 
 	list.appendChild(row);
+};
 
+function deleteTrailFromList(el) {
+	console.log(el);
+	el.parentElement.parentElement.remove();
 };
 
 
 document.addEventListener('DOMContentLoaded', getJSON());
 
+// delete a trail
 document.querySelector('#trails-table').addEventListener('click', function(e) {
 	if(e.target.name == 'delete'){
 		trail_id = e.target.id;
 		deleteTrail(trail_id);
-	};
-});
+		deleteTrailFromList(e.target);
+	}
 
+})
+
+// click add button
 document.querySelector('#add').addEventListener('click', (e) => { 
 	e.preventDefault();
 	sendJSON();
+	
+
 });
 
 

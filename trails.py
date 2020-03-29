@@ -1,23 +1,29 @@
 from flask import Flask, render_template, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+from sqlalchemy import create_engine, Column, Integer, String, Boolean
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
+from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
+
 import os
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 # Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
 
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
+db_session = scoped_session(sessionmaker(bind=engine))
 
-class Trail(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True)
-    neighborhood = db.Column(db.String(200))
-    distance = db.Column(db.Integer)
-    status = db.Column(db.Boolean)
+Base = declarative_base()
+
+class Trail(Base):
+    __tablename__ = 'trail'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), unique=True)
+    neighborhood = Column(String(200))
+    distance = Column(Integer)
+    status = Column(Boolean)
 
     def __init__(self, name, neighborhood, distance, status):
         self.name = name
@@ -25,10 +31,17 @@ class Trail(db.Model):
         self.distance = distance
         self.status = status
 
-class TrailSchema(ma.Schema):
+class TrailSchema(SQLAlchemySchema):
     class Meta:
-        fields = ('id', 'name', 'neighborhood', 'distance', 'status')
+        model = Trail
+        load_instance = True
 
+    id = auto_field()
+    name = auto_field()
+    neighborhood = auto_field()
+    distance = auto_field()
+    status = auto_field()
+    
 trail_schema = TrailSchema()
 trails_schema = TrailSchema(many=True)
 
@@ -45,22 +58,22 @@ def post_trail():
 
     new_trail = Trail(name, neighborhood, distance, status)
 
-    db.session.add(new_trail)
-    db.session.commit()
+    db_session.add(new_trail)
+    db_session.commit()
 
-    return trail_schema.jsonify(new_trail)
+    return 'd' 
 
 @app.route('/api/trail', methods=['GET']) # route is the endpoint
 def get_trails():
-    all_trails = Trail.query.all()
+    all_trails = db_session.execute("SELECT * FROM trail").fetchall()
     result = trails_schema.dump(all_trails)
     return jsonify(result) 
 
 
 @app.route('/api/trail/<id>', methods=['DELETE']) # route is the endpoint
 def delete_trail(id):
-    Trail.query.filter(Trail.id == id).delete()
-    db.session.commit()
+    db_session.query(Trail).filter(Trail.id == id).delete()
+    db_session.commit()
     return jsonify({'result': True})
 
 if __name__ == '__main__':

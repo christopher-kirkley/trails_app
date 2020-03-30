@@ -40,12 +40,21 @@ soup = BeautifulSoup(r.text)
 soup = soup.find_all('table')[3]
 
 l = []
-for link in soup.find_all('tr'):
-    for item in link.find_all('td'):
-        dict = {}
-        dict['name'] = link.find('a').get('title')
-        dict['link'] = link.find('a').get('href')
-        if item.get('class'):
-            item_name = item.get('class')[0]
-            dict[item_name] = item.text
-        l.append(dict)
+rows = []
+for row in soup.find_all('tr'):
+    rows.append(row)
+    for row in rows:
+        hike = {}
+        hike['name'] = row.find('a').get('title')
+        hike['link'] = base_url + row.find('a').get('href')
+        for row_item in row.find_all('td'):
+            if row_item.get('class'):
+                property_name = row_item.get('class')[0]
+                hike[property_name] = row_item.text.replace('\xa0', ' ')
+        l.append(hike)
+
+
+# Get fees and regulations in nested dict
+# Latitude Longitude
+# SCRAPE if start point
+
